@@ -23,19 +23,27 @@ function iniziale(nome) {
   return (nome || '?').trim().charAt(0).toUpperCase() || '?';
 }
 
+// Costruisce un elemento usando textContent (mai innerHTML) per i campi
+// utente, così nomi/numeri con caratteri speciali non rompono il rendering.
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
 function callableRow({ nome, numero, sub, time }) {
   const li = document.createElement('li');
   li.className = 'callable';
   li.dataset.numero = numero;
   li.dataset.nome = nome || '';
-  li.innerHTML = `
-    <span class="avatar">${iniziale(nome || numero)}</span>
-    <span class="row-main">
-      <span class="row-name">${nome || numero}</span>
-      ${sub ? `<span class="row-sub">${sub}</span>` : ''}
-    </span>
-    ${time ? `<span class="row-time">${time}</span>` : ''}
-    <span class="row-call">📞</span>`;
+  li.appendChild(el('span', 'avatar', iniziale(nome || numero)));
+  const main = el('span', 'row-main');
+  main.appendChild(el('span', 'row-name', nome || numero));
+  if (sub) main.appendChild(el('span', 'row-sub', sub));
+  li.appendChild(main);
+  if (time) li.appendChild(el('span', 'row-time', time));
+  li.appendChild(el('span', 'row-call', '📞'));
   return li;
 }
 
@@ -63,9 +71,11 @@ export function renderContacts(config) {
   const list = $('#contacts-list');
   list.innerHTML = '';
   const card = document.createElement('li');
-  card.innerHTML = `<span class="avatar">C</span>
-    <span class="row-main"><span class="row-name">Cri</span>
-    <span class="row-sub">My Card</span></span>`;
+  card.appendChild(el('span', 'avatar', 'C'));
+  const cardMain = el('span', 'row-main');
+  cardMain.appendChild(el('span', 'row-name', 'Cri'));
+  cardMain.appendChild(el('span', 'row-sub', 'My Card'));
+  card.appendChild(cardMain);
   list.appendChild(card);
   list.appendChild(callableRow({ nome: config.nome, numero: config.numero }));
 }
