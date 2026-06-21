@@ -1,0 +1,80 @@
+:root {
+  --bg: #000; --fg: #fff; --muted: #8e8e93;
+  --blue: #0a84ff; --green: #34c759; --red: #ff453a; --card: #1c1c1e;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
+  padding-top: env(safe-area-inset-top);
+}
+#app { min-height: 100vh; padding-bottom: 90px; }
+.hidden { display: none !important; }
+.screen { padding: 16px; }
+.tab-header { display: flex; align-items: center; justify-content: space-between; }
+.tab-header h2 { font-size: 28px; font-weight: 700; margin: 8px 0 16px; }
+
+/* Liste stile iOS */
+.list { list-style: none; margin: 0; padding: 0; }
+.list li {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 4px; border-bottom: 1px solid #1c1c1e;
+}
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #3a3a3c; color: #fff; display: flex;
+  align-items: center; justify-content: center; font-weight: 600; flex: 0 0 auto;
+}
+.row-main { flex: 1; min-width: 0; }
+.row-name { font-size: 17px; }
+.row-sub { font-size: 13px; color: var(--muted); }
+.row-time { color: var(--muted); font-size: 15px; }
+.row-call { width: 32px; height: 32px; border: 0; background: transparent; color: var(--blue); font-size: 20px; }
+.today-counter { color: var(--muted); margin: 0 4px 8px; }
+
+/* Keypad */
+.dial-display { text-align: center; font-size: 36px; min-height: 48px; margin: 24px 0; letter-spacing: 1px; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 320px; margin: 0 auto; }
+.key {
+  aspect-ratio: 1; border-radius: 50%; border: 0; background: var(--card);
+  color: var(--fg); font-size: 30px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.key small { font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.call-row { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px; position: relative; }
+.call-btn { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--green); }
+.call-btn::before { content: "📞"; font-size: 28px; }
+.dial-back { background: transparent; border: 0; color: var(--fg); font-size: 24px; }
+
+/* Tab bar */
+.tabbar {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 4px; background: #1c1c1ecc; backdrop-filter: blur(20px);
+  border-radius: 32px; padding: 8px 12px;
+}
+.tab-btn {
+  background: transparent; border: 0; color: var(--muted);
+  font-size: 11px; display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 6px 14px; border-radius: 24px;
+}
+.tab-btn .ico { font-size: 18px; }
+.tab-btn.active { color: var(--blue); background: #2c2c2e; }
+
+/* Schermo di blocco */
+#screen-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; gap: 16px; }
+.block-frase { font-size: 20px; color: var(--fg); max-width: 320px; }
+.block-name { font-size: 22px; font-weight: 600; }
+.countdown { font-size: 64px; font-variant-numeric: tabular-nums; font-weight: 300; }
+.block-hint { color: var(--muted); }
+.btn-msg { background: var(--green); color: #fff; padding: 14px 28px; border-radius: 24px; text-decoration: none; font-size: 17px; }
+.btn-ghost { background: transparent; border: 0; color: var(--muted); font-size: 16px; }
+
+/* Setup */
+#screen-setup label { display: block; margin: 12px 0; color: var(--muted); font-size: 14px; }
+#screen-setup input, #screen-setup textarea {
+  width: 100%; margin-top: 6px; padding: 12px; border-radius: 10px;
+  border: 1px solid #3a3a3c; background: #1c1c1e; color: var(--fg); font-size: 16px;
+}
+.btn-primary { width: 100%; padding: 14px; border: 0; border-radius: 12px; background: var(--blue); color: #fff; font-size: 17px; margin-top: 16px; }
+.search-header input { width: 100%; }
+#search-input { width: 100%; padding: 12px; border-radius: 10px; border: 0; background: #1c1c1e; color: var(--fg); font-size: 16px; }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <title>Telefono</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main id="app">
+    <!-- Setup -->
+    <section id="screen-setup" class="screen hidden">
+      <h1>Imposta Aspetta</h1>
+      <label>Nome <input id="set-nome" type="text" placeholder="Marco" /></label>
+      <label>Numero <input id="set-numero" type="tel" placeholder="+39 333 1234567" /></label>
+      <label>Link messaggi (WhatsApp/iMessage) <input id="set-msg" type="url" placeholder="https://wa.me/39..." /></label>
+      <label>Minuti d'attesa <input id="set-minuti" type="number" value="30" min="1" /></label>
+      <label>Frasi per te (una per riga)
+        <textarea id="set-frasi" rows="4" placeholder="respira, lo senti tra poco 💛"></textarea>
+      </label>
+      <button id="set-salva" class="btn-primary">Salva</button>
+    </section>
+
+    <!-- Schermo di blocco -->
+    <section id="screen-block" class="screen hidden">
+      <p id="block-frase" class="block-frase"></p>
+      <div class="block-name" id="block-name"></div>
+      <div class="countdown" id="block-countdown">30:00</div>
+      <p class="block-hint">Aspetta prima di richiamare</p>
+      <a id="block-msg" class="btn-msg" href="#">Scrivigli</a>
+      <button id="block-close" class="btn-ghost">Chiudi</button>
+    </section>
+
+    <!-- Tab: Recents -->
+    <section id="tab-recents" class="screen tab hidden">
+      <header class="tab-header"><h2>Recents</h2></header>
+      <p class="today-counter" id="today-counter"></p>
+      <ul class="list" id="recents-list"></ul>
+    </section>
+
+    <!-- Tab: Contacts -->
+    <section id="tab-contacts" class="screen tab hidden">
+      <header class="tab-header">
+        <h2>Contacts</h2>
+        <button id="open-setup" class="btn-ghost" aria-label="Impostazioni">⚙️</button>
+      </header>
+      <ul class="list" id="contacts-list"></ul>
+    </section>
+
+    <!-- Tab: Keypad -->
+    <section id="tab-keypad" class="screen tab">
+      <div class="dial-display" id="dial-display"></div>
+      <div class="keypad" id="keypad"></div>
+      <div class="call-row">
+        <button id="dial-call" class="call-btn" aria-label="Chiama"></button>
+        <button id="dial-back" class="dial-back" aria-label="Cancella">⌫</button>
+      </div>
+    </section>
+
+    <!-- Tab: Search -->
+    <section id="tab-search" class="screen tab hidden">
+      <header class="tab-header"><input id="search-input" type="search" placeholder="Cerca" /></header>
+      <ul class="list" id="search-list"></ul>
+    </section>
+
+    <!-- Tab bar -->
+    <nav class="tabbar">
+      <button class="tab-btn" data-tab="recents"><span class="ico">🕐</span>Calls</button>
+      <button class="tab-btn" data-tab="contacts"><span class="ico">👤</span>Contacts</button>
+      <button class="tab-btn active" data-tab="keypad"><span class="ico">🔢</span>Keypad</button>
+      <button class="tab-btn" data-tab="search"><span class="ico">🔍</span></button>
+    </nav>
+  </main>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
