@@ -74,7 +74,7 @@ export function renderContacts(config) {
   card.appendChild(el('span', 'avatar', 'C'));
   const cardMain = el('span', 'row-main');
   cardMain.appendChild(el('span', 'row-name', 'Cri'));
-  cardMain.appendChild(el('span', 'row-sub', 'My Card'));
+  cardMain.appendChild(el('span', 'row-sub', 'La mia scheda'));
   card.appendChild(cardMain);
   list.appendChild(card);
   list.appendChild(callableRow({ nome: config.nome, numero: config.numero }));
