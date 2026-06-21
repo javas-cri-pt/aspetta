@@ -83,7 +83,7 @@ function initKeypad() {
   $('#keypad').addEventListener('click', (e) => {
     const k = e.target.closest('.key');
     if (!k) return;
-    dialBuffer += k.dataset.key === '0' ? '0' : k.dataset.key;
+    dialBuffer += k.dataset.key;
     renderDial();
   });
   $('#dial-back').addEventListener('click', () => { dialBuffer = dialBuffer.slice(0, -1); renderDial(); });

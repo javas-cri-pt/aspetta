@@ -5,7 +5,9 @@ export function normalizeNumber(s) {
 export function sameNumber(a, b) {
   const ta = normalizeNumber(a).slice(-9);
   const tb = normalizeNumber(b).slice(-9);
-  return ta.length > 0 && ta === tb;
+  // Richiedi almeno 9 cifre: evita falsi match su numeri corti digitati dal
+  // tastierino (es. "1234") che per caso coincidono col finale del suo numero.
+  return ta.length >= 9 && ta === tb;
 }
 
 export function gateStatus(calls, config, now) {

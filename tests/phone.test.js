@@ -14,6 +14,12 @@ test('sameNumber confronta le ultime 9 cifre', () => {
   assert.equal(sameNumber('3331234567', '3339999999'), false);
 });
 
+test('sameNumber non combacia con numeri corti (< 9 cifre)', () => {
+  assert.equal(sameNumber('1234567', '+39 333 1234567'), false);
+  assert.equal(sameNumber('567', '331234567'), false);
+  assert.equal(sameNumber('', '331234567'), false);
+});
+
 const cfg = { numero: '+39 333 1234567', minutiAttesa: 30 };
 const MIN = 60 * 1000;
 
