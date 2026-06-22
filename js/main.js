@@ -53,8 +53,8 @@ function showBlock(config, numero, remainingMs) {
     if (!stato.blocked) { clearInterval(countdownTimer); switchTab('contacts'); return; }
     $('#block-countdown').textContent = countdown(stato.remainingMs);
   };
-  tick();
   clearInterval(countdownTimer);
+  tick();
   countdownTimer = setInterval(tick, 1000);
 }
 
@@ -76,8 +76,8 @@ function initWizard() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
+      // Parsa in memoria; persiste solo al "Salva e blocca" (commit atomico).
       wizContatti = parseVCard(reader.result);
-      saveContatti(wizContatti);
       $('#wiz-import-status').textContent = `Importati ${wizContatti.length} contatti.`;
       $('#wiz-next-import').disabled = wizContatti.length === 0;
     };
@@ -127,6 +127,7 @@ function renderWizRiepilogo() {
 
 function salvaSetup() {
   const frasi = $('#wiz-frasi').value.split('\n').map((s) => s.trim()).filter(Boolean);
+  saveContatti(wizContatti);
   saveConfig({
     minutiAttesa: 30,
     frasi,
