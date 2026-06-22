@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getConfig, saveConfig, getCalls, addCall } from '../js/store.js';
+import { getConfig, saveConfig, getCalls, addCall, getContatti, saveContatti } from '../js/store.js';
 
 function fakeStorage() {
   const data = {};
@@ -31,4 +31,20 @@ test('addCall accoda e persiste', () => {
   const calls = getCalls(s);
   assert.equal(calls.length, 2);
   assert.equal(calls[1].timestamp, 2);
+});
+
+test('getContatti parte da array vuoto', () => {
+  assert.deepEqual(getContatti(fakeStorage()), []);
+});
+
+test('saveContatti e getContatti round-trip', () => {
+  const s = fakeStorage();
+  saveContatti([{ nome: 'X', numero: '333' }], s);
+  assert.deepEqual(getContatti(s), [{ nome: 'X', numero: '333' }]);
+});
+
+test('config con bloccati e setupCompleto fa round-trip', () => {
+  const s = fakeStorage();
+  saveConfig({ minutiAttesa: 30, frasi: [], bloccati: ['333'], setupCompleto: true }, s);
+  assert.deepEqual(getConfig(s), { minutiAttesa: 30, frasi: [], bloccati: ['333'], setupCompleto: true });
 });

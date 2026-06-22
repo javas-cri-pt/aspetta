@@ -1,7 +1,17 @@
 const KEY_CONFIG = 'aspetta.config';
 const KEY_CALLS = 'aspetta.chiamate';
+const KEY_CONTATTI = 'aspetta.contatti';
 
 const ls = () => globalThis.localStorage;
+
+export function getContatti(storage = ls()) {
+  const raw = storage.getItem(KEY_CONTATTI);
+  return raw ? JSON.parse(raw) : [];
+}
+
+export function saveContatti(contatti, storage = ls()) {
+  storage.setItem(KEY_CONTATTI, JSON.stringify(contatti));
+}
 
 export function getConfig(storage = ls()) {
   const raw = storage.getItem(KEY_CONFIG);
