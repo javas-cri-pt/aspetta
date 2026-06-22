@@ -10,12 +10,16 @@ export function sameNumber(a, b) {
   return ta.length >= 9 && ta === tb;
 }
 
-export function gateStatus(calls, config, now) {
-  const waitMs = (config.minutiAttesa ?? 30) * 60 * 1000;
-  const suoi = (calls ?? []).filter((c) => sameNumber(c.numero, config.numero));
+export function gateStatus(calls, numeroTarget, minutiAttesa, now) {
+  const waitMs = (minutiAttesa ?? 30) * 60 * 1000;
+  const suoi = (calls ?? []).filter((c) => sameNumber(c.numero, numeroTarget));
   if (suoi.length === 0) return { blocked: false, remainingMs: 0 };
   const ultima = Math.max(...suoi.map((c) => c.timestamp));
   const trascorso = now - ultima;
   if (trascorso >= waitMs) return { blocked: false, remainingMs: 0 };
   return { blocked: true, remainingMs: waitMs - trascorso };
+}
+
+export function isBloccato(numero, config) {
+  return (config?.bloccati || []).some((b) => sameNumber(b, numero));
 }
