@@ -33,10 +33,11 @@ export function renderRubrica(contatti, config) {
   const list = $('#contacts-list');
   list.innerHTML = '';
 
+  const nomeUtente = (config && config.nomeUtente) ? config.nomeUtente : 'Tu';
   const card = el('li');
-  card.appendChild(el('span', 'avatar', 'C'));
+  card.appendChild(el('span', 'avatar', iniziale(nomeUtente)));
   const cardMain = el('span', 'row-main');
-  cardMain.appendChild(el('span', 'row-name', 'Cri'));
+  cardMain.appendChild(el('span', 'row-name', nomeUtente));
   cardMain.appendChild(el('span', 'row-sub', 'La mia scheda'));
   card.appendChild(cardMain);
   list.appendChild(card);

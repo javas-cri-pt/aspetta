@@ -34,18 +34,18 @@ body {
 .row-call { width: 32px; height: 32px; border: 0; background: transparent; color: var(--blue); font-size: 20px; }
 .today-counter { color: var(--muted); margin: 0 4px 8px; }
 
-/* Keypad */
-.dial-display { text-align: center; font-size: 36px; min-height: 48px; margin: 24px 0; letter-spacing: 1px; }
-.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 320px; margin: 0 auto; }
+/* Keypad — dimensioni ridotte per stare nello schermo senza scroll */
+.dial-display { text-align: center; font-size: 30px; min-height: 38px; margin: 10px 0; letter-spacing: 1px; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 248px; margin: 0 auto; }
 .key {
   aspect-ratio: 1; border-radius: 50%; border: 0; background: var(--card);
-  color: var(--fg); font-size: 30px; display: flex; flex-direction: column;
+  color: var(--fg); font-size: 26px; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
 }
-.key small { font-size: 10px; letter-spacing: 2px; color: var(--muted); }
-.call-row { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px; position: relative; }
-.call-btn { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--green); }
-.call-btn::before { content: "📞"; font-size: 28px; }
+.key small { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
+.call-row { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 14px; position: relative; }
+.call-btn { width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--green); }
+.call-btn::before { content: "📞"; font-size: 26px; }
 .dial-back { background: transparent; border: 0; color: var(--fg); font-size: 24px; }
 
 /* Tab bar */
@@ -97,3 +97,23 @@ body {
 .az-index button { background: transparent; border: 0; color: var(--blue); font-size: 11px; line-height: 1.1; padding: 0 4px; }
 .row-lock { color: var(--red); font-size: 14px; margin-left: 6px; }
 .list li.bloccato .row-name { font-weight: 600; }
+
+/* Scheda contatto */
+.contact-back { display: block; margin: 4px 0 8px; }
+.contact-card { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 40px; }
+.contact-avatar {
+  width: 96px; height: 96px; border-radius: 50%; background: #3a3a3c; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 600;
+}
+.contact-name { font-size: 26px; font-weight: 600; }
+.contact-number { color: var(--muted); font-size: 16px; margin-bottom: 16px; }
+.contact-call-label { color: var(--green); font-size: 13px; }
+
+/* Impostazioni */
+#screen-settings h1 { font-size: 24px; margin: 8px 0 16px; }
+#screen-settings label { display: block; margin: 12px 0; color: var(--muted); font-size: 14px; }
+#screen-settings input {
+  width: 100%; margin-top: 6px; padding: 12px; border-radius: 10px;
+  border: 1px solid #3a3a3c; background: #1c1c1e; color: var(--fg); font-size: 16px;
+}
+.wiz-status.err { color: var(--red); }

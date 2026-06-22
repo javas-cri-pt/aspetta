@@ -2,11 +2,11 @@ import { getConfig, saveConfig, getCalls, addCall, getContatti, saveContatti } f
 import { sameNumber, gateStatus, isBloccato } from './phone.js';
 import { countdown } from './format.js';
 import { parseVCard } from './vcard.js';
-import { renderRubrica } from './contacts-ui.js';
+import { renderRubrica } from './contacts-ui.js?v=4';
 import { nameForNumber } from './contacts.js';
 import {
   showScreen, switchTab, renderRecents, renderSearch, buildKeypad,
-} from './ui.js?v=3';
+} from './ui.js?v=4';
 
 const $ = (sel) => document.querySelector(sel);
 let countdownTimer = null;
@@ -159,14 +159,79 @@ function initKeypad() {
   });
 }
 
-// --- Delegazione click su righe chiamabili ---
+// --- Scheda contatto: il tap su una riga apre la scheda, NON chiama.
+// La chiamata (e il log) avviene solo premendo "Chiama" qui dentro. ---
+let contattoCorrente = null;
+
+function iniziale(s) {
+  return String(s || '?').trim().charAt(0).toUpperCase() || '?';
+}
+
+function openContact(numero, nome) {
+  contattoCorrente = { numero, nome: nome || '' };
+  $('#contact-avatar').textContent = iniziale(nome || numero);
+  $('#contact-name').textContent = nome || numero;
+  $('#contact-number').textContent = numero;
+  showScreen('screen-contact');
+}
+
 function initCallableLists() {
   document.querySelectorAll('.list').forEach((list) => {
     list.addEventListener('click', (e) => {
       const row = e.target.closest('.callable');
       if (!row) return;
-      placeCall(row.dataset.numero, row.dataset.nome);
+      openContact(row.dataset.numero, row.dataset.nome);
     });
+  });
+  $('#contact-call').addEventListener('click', () => {
+    if (contattoCorrente) placeCall(contattoCorrente.numero, contattoCorrente.nome);
+  });
+  $('#contact-back').addEventListener('click', () => switchTab('contacts'));
+}
+
+// --- Impostazioni protette da codice (modifica nome utente + minuti) ---
+let codiceSbloccato = null;
+
+function openSettings() {
+  const config = getConfig() || {};
+  codiceSbloccato = null;
+  $('#settings-code').value = '';
+  $('#settings-code-err').textContent = '';
+  $('#settings-lock-title').textContent = config.codice ? 'Inserisci codice' : 'Crea un codice';
+  $('#settings-nome').value = config.nomeUtente || '';
+  $('#settings-minuti').value = config.minutiAttesa || 30;
+  $('#settings-lock').classList.remove('hidden');
+  $('#settings-form').classList.add('hidden');
+  showScreen('screen-settings');
+}
+
+function initSettings() {
+  $('#open-settings').addEventListener('click', openSettings);
+  $('#settings-back').addEventListener('click', () => switchTab('contacts'));
+  $('#settings-unlock').addEventListener('click', () => {
+    const config = getConfig() || {};
+    const entered = $('#settings-code').value.trim();
+    if (config.codice) {
+      if (entered !== config.codice) { $('#settings-code-err').textContent = 'Codice errato.'; return; }
+      codiceSbloccato = config.codice;
+    } else {
+      if (!entered) { $('#settings-code-err').textContent = 'Scegli un codice.'; return; }
+      codiceSbloccato = entered; // verrà salvato al "Salva"
+    }
+    $('#settings-lock').classList.add('hidden');
+    $('#settings-form').classList.remove('hidden');
+  });
+  $('#settings-save').addEventListener('click', () => {
+    const config = getConfig() || {};
+    const minuti = parseInt($('#settings-minuti').value, 10);
+    saveConfig({
+      ...config,
+      nomeUtente: $('#settings-nome').value.trim() || config.nomeUtente || 'Tu',
+      minutiAttesa: Number.isFinite(minuti) && minuti >= 1 ? minuti : (config.minutiAttesa || 30),
+      codice: config.codice || codiceSbloccato,
+    });
+    refreshTabs(getConfig());
+    switchTab('contacts');
   });
 }
 
@@ -191,6 +256,7 @@ function init() {
   initKeypad();
   initCallableLists();
   initWizard();
+  initSettings();
 
   document.querySelectorAll('.tab-btn').forEach((b) => {
     b.addEventListener('click', () => {

@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-180.png" />
   <title>Telefono</title>
-  <link rel="stylesheet" href="css/styles.css?v=3" />
+  <link rel="stylesheet" href="css/styles.css?v=4" />
 </head>
 <body>
   <main id="app">
@@ -55,6 +55,35 @@
       <button id="block-close" class="btn-ghost">Chiudi</button>
     </section>
 
+    <!-- Scheda contatto (la chiamata si logga solo da qui) -->
+    <section id="screen-contact" class="screen hidden">
+      <button id="contact-back" class="btn-ghost contact-back">‹ Indietro</button>
+      <div class="contact-card">
+        <div class="contact-avatar" id="contact-avatar"></div>
+        <div class="contact-name" id="contact-name"></div>
+        <div class="contact-number" id="contact-number"></div>
+        <button id="contact-call" class="call-btn" aria-label="Chiama"></button>
+        <div class="contact-call-label">chiama</div>
+      </div>
+    </section>
+
+    <!-- Impostazioni (protette da codice) -->
+    <section id="screen-settings" class="screen hidden">
+      <button id="settings-back" class="btn-ghost contact-back">‹ Indietro</button>
+      <div id="settings-lock">
+        <h1 id="settings-lock-title">Inserisci codice</h1>
+        <input id="settings-code" type="password" inputmode="numeric" placeholder="Codice" />
+        <p id="settings-code-err" class="wiz-status err"></p>
+        <button id="settings-unlock" class="btn-primary">Sblocca</button>
+      </div>
+      <div id="settings-form" class="hidden">
+        <h1>Impostazioni</h1>
+        <label>Il tuo nome (Mia scheda) <input id="settings-nome" type="text" placeholder="Cri" /></label>
+        <label>Minuti d'attesa <input id="settings-minuti" type="number" min="1" /></label>
+        <button id="settings-save" class="btn-primary">Salva</button>
+      </div>
+    </section>
+
     <!-- Tab: Recents -->
     <section id="tab-recents" class="screen tab hidden">
       <header class="tab-header"><h2>Recenti</h2></header>
@@ -64,7 +93,10 @@
 
     <!-- Tab: Contacts -->
     <section id="tab-contacts" class="screen tab hidden">
-      <header class="tab-header"><h2>Contatti</h2></header>
+      <header class="tab-header">
+        <h2>Contatti</h2>
+        <button id="open-settings" class="btn-ghost" aria-label="Impostazioni">⚙️</button>
+      </header>
       <ul class="list" id="contacts-list"></ul>
       <nav id="az-index" class="az-index" aria-label="Indice alfabetico"></nav>
     </section>
@@ -93,6 +125,6 @@
       <button class="tab-btn" data-tab="search"><span class="ico">🔍</span></button>
     </nav>
   </main>
-  <script type="module" src="js/main.js?v=3"></script>
+  <script type="module" src="js/main.js?v=4"></script>
 </body>
 </html>

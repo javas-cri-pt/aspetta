@@ -4,7 +4,7 @@ import { nameForNumber } from './contacts.js';
 
 const $ = (sel) => document.querySelector(sel);
 
-const SCREENS = ['screen-setup', 'screen-block', 'tab-recents', 'tab-contacts', 'tab-keypad', 'tab-search'];
+const SCREENS = ['screen-setup', 'screen-block', 'screen-contact', 'screen-settings', 'tab-recents', 'tab-contacts', 'tab-keypad', 'tab-search'];
 
 export function showScreen(id) {
   for (const s of SCREENS) {
