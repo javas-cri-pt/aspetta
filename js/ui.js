@@ -18,6 +18,8 @@ export function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b) => {
     b.classList.toggle('active', b.dataset.tab === name);
   });
+  // Riparti dall'alto: così la barra di ricerca (e le intestazioni) sono subito visibili.
+  window.scrollTo(0, 0);
 }
 
 function iniziale(nome) {
