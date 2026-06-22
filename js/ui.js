@@ -1,5 +1,6 @@
 import { relativeTime } from './format.js';
 import { sameNumber } from './phone.js';
+import { nameForNumber } from './contacts.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -47,56 +48,39 @@ function callableRow({ nome, numero, sub, time }) {
   return li;
 }
 
-export function renderRecents(calls, config, now) {
+export function renderRecents(calls, config, contatti, now) {
   const list = $('#recents-list');
   list.innerHTML = '';
   const ordinate = [...calls].sort((a, b) => b.timestamp - a.timestamp);
   for (const c of ordinate) {
     list.appendChild(callableRow({
-      nome: c.nome || c.numero,
+      nome: nameForNumber(c.numero, contatti),
       numero: c.numero,
       sub: '↗ chiamata',
       time: relativeTime(c.timestamp, now),
     }));
   }
   const inizioGiorno = new Date(now); inizioGiorno.setHours(0, 0, 0, 0);
-  const oggiLui = calls.filter((c) =>
-    sameNumber(c.numero, config.numero) && c.timestamp >= inizioGiorno.getTime());
-  $('#today-counter').textContent = oggiLui.length
-    ? `${oggiLui.length} a ${config.nome} oggi`
+  const oggiBloccati = calls.filter((c) =>
+    (config.bloccati || []).some((b) => sameNumber(b, c.numero)) && c.timestamp >= inizioGiorno.getTime());
+  $('#today-counter').textContent = oggiBloccati.length
+    ? `${oggiBloccati.length} a contatti bloccati oggi`
     : '';
 }
 
-export function renderContacts(config) {
-  const list = $('#contacts-list');
-  list.innerHTML = '';
-  const card = document.createElement('li');
-  card.appendChild(el('span', 'avatar', 'C'));
-  const cardMain = el('span', 'row-main');
-  cardMain.appendChild(el('span', 'row-name', 'Cri'));
-  cardMain.appendChild(el('span', 'row-sub', 'La mia scheda'));
-  card.appendChild(cardMain);
-  list.appendChild(card);
-  list.appendChild(callableRow({ nome: config.nome, numero: config.numero }));
-}
-
-export function renderSearch(query, calls, config) {
+export function renderSearch(query, contatti) {
   const list = $('#search-list');
   list.innerHTML = '';
   const q = query.trim().toLowerCase();
-  const candidati = [
-    { nome: config.nome, numero: config.numero },
-    ...calls.map((c) => ({ nome: c.nome || c.numero, numero: c.numero })),
-  ];
+  if (!q) return;
   const visti = new Set();
-  const filtrati = candidati.filter((c) => {
-    const key = c.numero;
-    if (visti.has(key)) return false;
-    visti.add(key);
-    if (!q) return false;
-    return (c.nome || '').toLowerCase().includes(q) || c.numero.includes(q);
-  });
-  for (const c of filtrati) list.appendChild(callableRow(c));
+  for (const c of contatti) {
+    if (visti.has(c.numero)) continue;
+    visti.add(c.numero);
+    if ((c.nome || '').toLowerCase().includes(q) || c.numero.includes(q)) {
+      list.appendChild(callableRow({ nome: c.nome, numero: c.numero }));
+    }
+  }
 }
 
 const KEYS = [

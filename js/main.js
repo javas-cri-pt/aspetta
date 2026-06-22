@@ -1,46 +1,56 @@
-import { getConfig, saveConfig, getCalls, addCall } from './store.js';
-import { sameNumber, gateStatus } from './phone.js';
+import { getConfig, saveConfig, getCalls, addCall, getContatti, saveContatti } from './store.js';
+import { sameNumber, gateStatus, isBloccato } from './phone.js';
 import { countdown } from './format.js';
+import { parseVCard } from './vcard.js';
+import { renderRubrica } from './contacts-ui.js';
+import { nameForNumber } from './contacts.js';
 import {
-  showScreen, switchTab, renderRecents, renderContacts,
-  renderSearch, buildKeypad,
+  showScreen, switchTab, renderRecents, renderSearch, buildKeypad,
 } from './ui.js';
 
 const $ = (sel) => document.querySelector(sel);
 let countdownTimer = null;
 
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
 function refreshTabs(config) {
   const calls = getCalls();
-  renderRecents(calls, config, Date.now());
-  renderContacts(config);
+  const contatti = getContatti();
+  renderRecents(calls, config, contatti, Date.now());
+  renderRubrica(contatti, config);
 }
 
 // --- Chiamata + gate ---
 function placeCall(numero, nome) {
   const config = getConfig();
-  if (sameNumber(numero, config.numero)) {
-    const stato = gateStatus(getCalls(), config, Date.now());
-    if (stato.blocked) { showBlock(config, stato.remainingMs); return; }
+  if (isBloccato(numero, config)) {
+    const stato = gateStatus(getCalls(), numero, config.minutiAttesa, Date.now());
+    if (stato.blocked) { showBlock(config, numero, stato.remainingMs); return; }
   }
   addCall({ numero, nome: nome || '', timestamp: Date.now() });
   refreshTabs(config);
-  window.location.href = `tel:${numero}`;
+  window.location.href = `tel:${String(numero).replace(/\s/g, '')}`;
 }
 
-function showBlock(config, remainingMs) {
+function showBlock(config, numero, remainingMs) {
   const frasi = config.frasi && config.frasi.length ? config.frasi : ['Aspetta un attimo.'];
-  // indice pseudo-casuale basato sul tempo, senza Math.random (deterministico per secondo)
   const idx = Math.floor(remainingMs / 1000) % frasi.length;
   $('#block-frase').textContent = frasi[idx];
-  $('#block-name').textContent = config.nome;
+  $('#block-name').textContent = nameForNumber(numero, getContatti());
   const msg = $('#block-msg');
-  if (config.linkMessaggi) { msg.href = config.linkMessaggi; msg.classList.remove('hidden'); }
-  else { msg.classList.add('hidden'); }
+  const norm = String(numero).replace(/\s/g, '');
+  msg.href = `https://wa.me/${norm.replace(/^\+/, '')}`;
+  msg.classList.remove('hidden');
   showScreen('screen-block');
 
   const tick = () => {
-    const stato = gateStatus(getCalls(), config, Date.now());
-    if (!stato.blocked) { clearInterval(countdownTimer); switchTab('keypad'); return; }
+    const stato = gateStatus(getCalls(), numero, config.minutiAttesa, Date.now());
+    if (!stato.blocked) { clearInterval(countdownTimer); switchTab('contacts'); return; }
     $('#block-countdown').textContent = countdown(stato.remainingMs);
   };
   tick();
@@ -48,30 +58,84 @@ function showBlock(config, remainingMs) {
   countdownTimer = setInterval(tick, 1000);
 }
 
-// --- Setup ---
-function openSetup(existing) {
-  if (existing) {
-    $('#set-nome').value = existing.nome || '';
-    $('#set-numero').value = existing.numero || '';
-    $('#set-msg').value = existing.linkMessaggi || '';
-    $('#set-minuti').value = existing.minutiAttesa || 30;
-    $('#set-frasi').value = (existing.frasi || []).join('\n');
-  }
+// --- Setup wizard (una tantum) ---
+let wizContatti = [];
+let wizBloccati = new Set();
+
+function showWizStep(step) {
+  document.querySelectorAll('#screen-setup .wiz-step').forEach((s) => {
+    s.classList.toggle('hidden', s.dataset.step !== step);
+  });
   showScreen('screen-setup');
 }
 
-function saveSetup() {
-  const cfg = {
-    nome: $('#set-nome').value.trim() || 'Lui',
-    numero: $('#set-numero').value.trim(),
-    linkMessaggi: $('#set-msg').value.trim(),
-    minutiAttesa: parseInt($('#set-minuti').value, 10) || 30,
-    frasi: $('#set-frasi').value.split('\n').map((s) => s.trim()).filter(Boolean),
-  };
-  if (!cfg.numero) { alert('Inserisci il numero.'); return; }
-  saveConfig(cfg);
-  refreshTabs(cfg);
-  switchTab('keypad');
+function initWizard() {
+  const fileInput = $('#wiz-file');
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      wizContatti = parseVCard(reader.result);
+      saveContatti(wizContatti);
+      $('#wiz-import-status').textContent = `Importati ${wizContatti.length} contatti.`;
+      $('#wiz-next-import').disabled = wizContatti.length === 0;
+    };
+    reader.readAsText(file);
+  });
+
+  $('#wiz-next-import').addEventListener('click', () => { renderWizBloccati(''); showWizStep('bloccati'); });
+  $('#wiz-bloccati-search').addEventListener('input', (e) => renderWizBloccati(e.target.value));
+  $('#wiz-next-bloccati').addEventListener('click', () => showWizStep('frasi'));
+  $('#wiz-next-frasi').addEventListener('click', () => { renderWizRiepilogo(); showWizStep('conferma'); });
+  $('#wiz-salva').addEventListener('click', salvaSetup);
+}
+
+function renderWizBloccati(query) {
+  const list = $('#wiz-bloccati-list');
+  list.innerHTML = '';
+  const q = query.trim().toLowerCase();
+  const filtrati = wizContatti.filter((c) =>
+    !q || (c.nome || '').toLowerCase().includes(q) || c.numero.includes(q));
+  for (const c of filtrati) {
+    const li = el('li');
+    li.classList.toggle('sel', wizBloccati.has(c.numero));
+    const main = el('span', 'row-main');
+    main.appendChild(el('span', 'row-name', c.nome || c.numero));
+    li.appendChild(main);
+    li.appendChild(el('span', 'chk'));
+    li.addEventListener('click', () => {
+      if (wizBloccati.has(c.numero)) wizBloccati.delete(c.numero);
+      else wizBloccati.add(c.numero);
+      li.classList.toggle('sel');
+    });
+    list.appendChild(li);
+  }
+}
+
+function renderWizRiepilogo() {
+  const list = $('#wiz-riepilogo');
+  list.innerHTML = '';
+  const byNumero = new Map(wizContatti.map((c) => [c.numero, c.nome]));
+  for (const numero of wizBloccati) {
+    const li = el('li');
+    li.appendChild(el('span', 'avatar', '🔒'));
+    li.appendChild(el('span', 'row-name', byNumero.get(numero) || numero));
+    list.appendChild(li);
+  }
+}
+
+function salvaSetup() {
+  const frasi = $('#wiz-frasi').value.split('\n').map((s) => s.trim()).filter(Boolean);
+  saveConfig({
+    minutiAttesa: 30,
+    frasi,
+    bloccati: [...wizBloccati],
+    setupCompleto: true,
+  });
+  const config = getConfig();
+  refreshTabs(config);
+  switchTab('contacts');
 }
 
 // --- Keypad ---
@@ -89,9 +153,7 @@ function initKeypad() {
   $('#dial-back').addEventListener('click', () => { dialBuffer = dialBuffer.slice(0, -1); renderDial(); });
   $('#dial-call').addEventListener('click', () => {
     if (!dialBuffer) return;
-    const config = getConfig();
-    const nome = sameNumber(dialBuffer, config.numero) ? config.nome : '';
-    placeCall(dialBuffer, nome);
+    placeCall(dialBuffer, nameForNumber(dialBuffer, getContatti()));
     dialBuffer = ''; renderDial();
   });
 }
@@ -110,6 +172,7 @@ function initCallableLists() {
 function init() {
   initKeypad();
   initCallableLists();
+  initWizard();
 
   document.querySelectorAll('.tab-btn').forEach((b) => {
     b.addEventListener('click', () => {
@@ -120,18 +183,13 @@ function init() {
     });
   });
 
-  $('#search-input').addEventListener('input', (e) => {
-    renderSearch(e.target.value, getCalls(), getConfig());
-  });
-
-  $('#set-salva').addEventListener('click', saveSetup);
-  $('#open-setup').addEventListener('click', () => openSetup(getConfig()));
-  $('#block-close').addEventListener('click', () => { clearInterval(countdownTimer); switchTab('keypad'); });
+  $('#search-input').addEventListener('input', (e) => renderSearch(e.target.value, getContatti()));
+  $('#block-close').addEventListener('click', () => { clearInterval(countdownTimer); switchTab('contacts'); });
 
   const config = getConfig();
-  if (!config || !config.numero) { openSetup(config); return; }
+  if (!config || !config.setupCompleto) { showWizStep('import'); return; }
   refreshTabs(config);
-  switchTab('keypad');
+  switchTab('contacts');
 }
 
 document.addEventListener('DOMContentLoaded', init);
