@@ -6,7 +6,7 @@ import { renderRubrica } from './contacts-ui.js';
 import { nameForNumber } from './contacts.js';
 import {
   showScreen, switchTab, renderRecents, renderSearch, buildKeypad,
-} from './ui.js';
+} from './ui.js?v=3';
 
 const $ = (sel) => document.querySelector(sel);
 let countdownTimer = null;
@@ -170,7 +170,24 @@ function initCallableLists() {
   });
 }
 
+// Blocca lo zoom su iOS: il viewport meta viene ignorato da Safari, quindi
+// servono i listener JS. gesturestart/change = pinch; doppio-tap = zoom da tap.
+function initNoZoom() {
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((ev) =>
+    document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+}
+
 function init() {
+  initNoZoom();
   initKeypad();
   initCallableLists();
   initWizard();
