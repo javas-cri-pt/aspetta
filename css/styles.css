@@ -78,3 +78,20 @@ body {
 .btn-primary { width: 100%; padding: 14px; border: 0; border-radius: 12px; background: var(--blue); color: #fff; font-size: 17px; margin-top: 16px; }
 .search-header input { width: 100%; }
 #search-input { width: 100%; padding: 12px; border-radius: 10px; border: 0; background: #1c1c1e; color: var(--fg); font-size: 16px; }
+
+/* Wizard */
+.wiz-step h1 { font-size: 26px; margin: 8px 0 4px; }
+.wiz-hint { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+.wiz-status { color: var(--green); font-size: 14px; }
+#wiz-file { color: var(--fg); margin: 12px 0; }
+.checklist li { justify-content: space-between; cursor: pointer; }
+.checklist li .chk { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--muted); flex: 0 0 auto; }
+.checklist li.sel .chk { background: var(--blue); border-color: var(--blue); }
+#wiz-bloccati-search { width: 100%; padding: 12px; border-radius: 10px; border: 0; background: #1c1c1e; color: var(--fg); font-size: 16px; margin-bottom: 12px; }
+
+/* Sezioni rubrica + indice A-Z */
+.sec-header { color: var(--muted); font-size: 13px; font-weight: 700; padding: 8px 4px 4px; position: sticky; top: 0; background: var(--bg); }
+.az-index { position: fixed; right: 2px; top: 80px; bottom: 90px; display: flex; flex-direction: column; justify-content: center; gap: 1px; z-index: 5; }
+.az-index button { background: transparent; border: 0; color: var(--blue); font-size: 11px; line-height: 1.1; padding: 0 4px; }
+.row-lock { color: var(--red); font-size: 14px; margin-left: 6px; }
+.list li.bloccato .row-name { font-weight: 600; }

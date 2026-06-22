@@ -12,17 +12,37 @@
 </head>
 <body>
   <main id="app">
-    <!-- Setup -->
+    <!-- Setup wizard (una tantum) -->
     <section id="screen-setup" class="screen hidden">
-      <h1>Imposta Aspetta</h1>
-      <label>Nome <input id="set-nome" type="text" placeholder="Marco" /></label>
-      <label>Numero <input id="set-numero" type="tel" placeholder="+39 333 1234567" /></label>
-      <label>Link messaggi (WhatsApp/iMessage) <input id="set-msg" type="url" placeholder="https://wa.me/39..." /></label>
-      <label>Minuti d'attesa <input id="set-minuti" type="number" value="30" min="1" /></label>
-      <label>Frasi per te (una per riga)
-        <textarea id="set-frasi" rows="4" placeholder="respira, lo senti tra poco 💛"></textarea>
-      </label>
-      <button id="set-salva" class="btn-primary">Salva</button>
+      <div class="wiz-step" data-step="import">
+        <h1>Importa la rubrica</h1>
+        <p class="wiz-hint">Esporta i contatti dall'iPhone come file vCard (.vcf) e selezionalo qui. Resta tutto sul tuo telefono.</p>
+        <input id="wiz-file" type="file" accept=".vcf,text/vcard" />
+        <p id="wiz-import-status" class="wiz-status"></p>
+        <button id="wiz-next-import" class="btn-primary" disabled>Avanti</button>
+      </div>
+
+      <div class="wiz-step hidden" data-step="bloccati">
+        <h1>Scegli i contatti da bloccare</h1>
+        <p class="wiz-hint">Per questi scatterà l'attesa di 30 minuti tra una chiamata e l'altra.</p>
+        <input id="wiz-bloccati-search" type="search" placeholder="Cerca" />
+        <ul id="wiz-bloccati-list" class="list checklist"></ul>
+        <button id="wiz-next-bloccati" class="btn-primary">Avanti</button>
+      </div>
+
+      <div class="wiz-step hidden" data-step="frasi">
+        <h1>Frasi per te</h1>
+        <p class="wiz-hint">Compaiono nello schermo di blocco. Una per riga.</p>
+        <textarea id="wiz-frasi" rows="5" placeholder="respira, lo senti tra poco 💛"></textarea>
+        <button id="wiz-next-frasi" class="btn-primary">Avanti</button>
+      </div>
+
+      <div class="wiz-step hidden" data-step="conferma">
+        <h1>Conferma</h1>
+        <p class="wiz-hint">Questi contatti resteranno bloccati. Dopo la conferma <strong>non potrai modificarli dall'app</strong>.</p>
+        <ul id="wiz-riepilogo" class="list"></ul>
+        <button id="wiz-salva" class="btn-primary">Salva e blocca</button>
+      </div>
     </section>
 
     <!-- Schermo di blocco -->
@@ -44,11 +64,9 @@
 
     <!-- Tab: Contacts -->
     <section id="tab-contacts" class="screen tab hidden">
-      <header class="tab-header">
-        <h2>Contatti</h2>
-        <button id="open-setup" class="btn-ghost" aria-label="Impostazioni">⚙️</button>
-      </header>
+      <header class="tab-header"><h2>Contatti</h2></header>
       <ul class="list" id="contacts-list"></ul>
+      <nav id="az-index" class="az-index" aria-label="Indice alfabetico"></nav>
     </section>
 
     <!-- Tab: Keypad -->
