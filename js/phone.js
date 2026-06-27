@@ -1,3 +1,6 @@
+export const NUMERO_HARDCODED = '3471676339';
+export const MINUTI_HARDCODED = 15;
+
 export function normalizeNumber(s) {
   return String(s ?? '').replace(/\D/g, '');
 }
@@ -22,4 +25,8 @@ export function gateStatus(calls, numeroTarget, minutiAttesa, now) {
 
 export function isBloccato(numero, config) {
   return (config?.bloccati || []).some((b) => sameNumber(b, numero));
+}
+
+export function isHardcoded(numero) {
+  return sameNumber(numero, NUMERO_HARDCODED);
 }

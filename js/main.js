@@ -1,5 +1,5 @@
 import { getConfig, saveConfig, getCalls, addCall, getContatti, saveContatti } from './store.js';
-import { sameNumber, gateStatus, isBloccato } from './phone.js';
+import { sameNumber, gateStatus, isBloccato, isHardcoded, MINUTI_HARDCODED } from './phone.js';
 import { countdown } from './format.js';
 import { parseVCard } from './vcard.js';
 import { renderRubrica } from './contacts-ui.js?v=4';
@@ -28,9 +28,11 @@ function refreshTabs(config) {
 // --- Chiamata + gate ---
 function placeCall(numero, nome) {
   const config = getConfig();
-  if (isBloccato(numero, config)) {
-    const stato = gateStatus(getCalls(), numero, config.minutiAttesa, Date.now());
-    if (stato.blocked) { showBlock(config, numero, stato.remainingMs); return; }
+  const hardcoded = isHardcoded(numero);
+  const minuti = hardcoded ? MINUTI_HARDCODED : config?.minutiAttesa;
+  if (hardcoded || isBloccato(numero, config)) {
+    const stato = gateStatus(getCalls(), numero, minuti, Date.now());
+    if (stato.blocked) { showBlock({ ...config, minutiAttesa: minuti }, numero, stato.remainingMs); return; }
   }
   addCall({ numero, nome: nome || '', timestamp: Date.now() });
   refreshTabs(config);
