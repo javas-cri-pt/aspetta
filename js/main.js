@@ -1,5 +1,5 @@
 import { getConfig, saveConfig, getCalls, addCall, getContatti, saveContatti } from './store.js';
-import { sameNumber, gateStatus, isBloccato, isHardcoded, MINUTI_HARDCODED } from './phone.js';
+import { sameNumber, gateStatus, isBloccato, isHardcoded, MINUTI_HARDCODED, normalizeNumber } from './phone.js';
 import { countdown } from './format.js';
 import { parseVCard } from './vcard.js';
 import { renderRubrica } from './contacts-ui.js?v=4';
@@ -234,6 +234,23 @@ function initSettings() {
     });
     refreshTabs(getConfig());
     switchTab('contacts');
+  });
+  $('#add-contatto').addEventListener('click', () => {
+    const nome = $('#add-nome').value.trim();
+    const numero = $('#add-numero').value.trim();
+    if (normalizeNumber(numero).length < 5) { $('#add-status').textContent = 'Numero non valido.'; return; }
+    const contatti = getContatti();
+    contatti.push({ nome: nome || numero, numero });
+    saveContatti(contatti);
+    if ($('#add-blocca').checked) {
+      const config = getConfig() || {};
+      const bloccati = config.bloccati || [];
+      if (!bloccati.some((b) => sameNumber(b, numero))) bloccati.push(numero);
+      saveConfig({ ...config, bloccati });
+    }
+    $('#add-status').textContent = `Aggiunto: ${nome || numero}.`;
+    $('#add-nome').value = ''; $('#add-numero').value = ''; $('#add-blocca').checked = false;
+    refreshTabs(getConfig());
   });
 }
 
